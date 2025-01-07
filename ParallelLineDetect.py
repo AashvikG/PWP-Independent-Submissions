@@ -25,16 +25,15 @@ def filter_lines(lines, angle_threshold=20):
     for line in lines:
         x1, y1, x2, y2 = line[0]
         angle = abs(np.degrees(np.arctan2(y2 - y1, x2 - x1)))
-        
-        # Check for vertical lines (near 90 degrees)
+    
         if 90 - angle_threshold <= angle <= 90 + angle_threshold:
-            if y2 > y1:  # Ensure consistent orientation
+            if y2 > y1:  
                 x1, y1, x2, y2 = x2, y2, x1, y1
             filtered_lines.append([x1, y1, x2, y2])
             
-        # Check for horizontal lines (near 0 or 180 degrees)
+        
         if angle <= angle_threshold or angle >= 180 - angle_threshold:
-            if x2 < x1:  # Ensure consistent orientation
+            if x2 < x1:  
                 x1, y1, x2, y2 = x2, y2, x1, y1
             filtered_lines.append([x1, y1, x2, y2])
     
@@ -49,7 +48,7 @@ def get_two_main_lines(lines, frame_width):
     if len(lines) < 2:
         return []
     
-    # Sort lines by x-coordinate
+   
     lines.sort(key=lambda line: line[0])
     
     left_lines = []
@@ -73,15 +72,15 @@ def draw_lines_and_center(frame, lines):
     global previous_mid_x
     line_image = np.zeros_like(frame)
     
-    # Draw all detected lines
+
     for x1, y1, x2, y2 in lines:
         cv2.line(line_image, (x1, y1), (x2, y2), (255, 0, 0), 3)
 
-    # Draw both vertical and horizontal center lines when their respective parallel lines are detected
+    
     vertical_lines = [line for line in lines if abs(np.degrees(np.arctan2(line[3] - line[1], line[2] - line[0]))) > 70]
     horizontal_lines = [line for line in lines if abs(np.degrees(np.arctan2(line[3] - line[1], line[2] - line[0]))) < 20]
     
-    # Draw vertical center line if we have two vertical lines
+    
     main_vertical_lines = get_two_main_lines(vertical_lines, frame.shape[1])
     if len(main_vertical_lines) == 2:
         left_x = main_vertical_lines[0][0]
@@ -93,7 +92,7 @@ def draw_lines_and_center(frame, lines):
         height = frame.shape[0]
         cv2.line(line_image, (mid_x, 0), (mid_x, height), (0, 0, 255), 3)
     
-    # Draw horizontal center line if we have two horizontal lines
+    
     if len(horizontal_lines) >= 2:
         horizontal_lines.sort(key=lambda line: line[1])
         top_line = horizontal_lines[0]
